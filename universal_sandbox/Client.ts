@@ -5,7 +5,7 @@
 import * as environments from "./environments.js";
 import * as core from "./core/index.js";
 import { mergeHeaders, mergeOnlyDefinedHeaders } from "./core/headers.js";
-import * as AiInfraApi from "./api/index.js";
+import * as Sandbox from "./api/index.js";
 import * as errors from "./errors/index.js";
 import { CodeInterpreter } from "./api/resources/codeInterpreter/client/Client.js";
 import { Browser } from "./api/resources/browser/client/Client.js";
@@ -13,9 +13,9 @@ import { Aio } from "./api/resources/aio/client/Client.js";
 import { Sandboxes } from "./api/resources/sandboxes/client/Client.js";
 import { Tokens } from "./api/resources/tokens/client/Client.js";
 
-export declare namespace AiInfraApiClient {
+export declare namespace SandboxClient {
     export interface Options {
-        environment?: core.Supplier<environments.AiInfraApiEnvironment | string>;
+        environment?: core.Supplier<environments.SandboxEnvironment | string>;
         /** Specify a custom URL to connect the client to. */
         baseUrl?: core.Supplier<string>;
         token?: core.Supplier<core.BearerToken | undefined>;
@@ -37,15 +37,15 @@ export declare namespace AiInfraApiClient {
     }
 }
 
-export class AiInfraApiClient {
-    protected readonly _options: AiInfraApiClient.Options;
+export class SandboxClient {
+    protected readonly _options: SandboxClient.Options;
     protected _codeInterpreter: CodeInterpreter | undefined;
     protected _browser: Browser | undefined;
     protected _aio: Aio | undefined;
     protected _sandboxes: Sandboxes | undefined;
     protected _tokens: Tokens | undefined;
 
-    constructor(_options: AiInfraApiClient.Options = {}) {
+    constructor(_options: SandboxClient.Options = {}) {
         this._options = {
             ..._options,
             headers: mergeHeaders(
@@ -82,20 +82,18 @@ export class AiInfraApiClient {
     /**
      * Check service health status.
      *
-     * @param {AiInfraApiClient.RequestOptions} requestOptions - Request-specific configuration.
+     * @param {SandboxClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
      *     await client.checkHealth()
      */
-    public checkHealth(
-        requestOptions?: AiInfraApiClient.RequestOptions,
-    ): core.HttpResponsePromise<AiInfraApi.HealthStatus> {
+    public checkHealth(requestOptions?: SandboxClient.RequestOptions): core.HttpResponsePromise<Sandbox.HealthStatus> {
         return core.HttpResponsePromise.fromPromise(this.__checkHealth(requestOptions));
     }
 
     private async __checkHealth(
-        requestOptions?: AiInfraApiClient.RequestOptions,
-    ): Promise<core.WithRawResponse<AiInfraApi.HealthStatus>> {
+        requestOptions?: SandboxClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Sandbox.HealthStatus>> {
         let _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             this._options?.headers,
             mergeOnlyDefinedHeaders({ Authorization: await this._getAuthorizationHeader() }),
@@ -105,7 +103,7 @@ export class AiInfraApiClient {
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
                     (await core.Supplier.get(this._options.environment)) ??
-                    environments.AiInfraApiEnvironment.Production,
+                    environments.SandboxEnvironment.Production,
                 "health",
             ),
             method: "GET",
@@ -116,11 +114,11 @@ export class AiInfraApiClient {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return { data: _response.body as AiInfraApi.HealthStatus, rawResponse: _response.rawResponse };
+            return { data: _response.body as Sandbox.HealthStatus, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
-            throw new errors.AiInfraApiError({
+            throw new errors.SandboxError({
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
                 rawResponse: _response.rawResponse,
@@ -129,15 +127,15 @@ export class AiInfraApiClient {
 
         switch (_response.error.reason) {
             case "non-json":
-                throw new errors.AiInfraApiError({
+                throw new errors.SandboxError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
                     rawResponse: _response.rawResponse,
                 });
             case "timeout":
-                throw new errors.AiInfraApiTimeoutError("Timeout exceeded when calling GET /health.");
+                throw new errors.SandboxTimeoutError("Timeout exceeded when calling GET /health.");
             case "unknown":
-                throw new errors.AiInfraApiError({
+                throw new errors.SandboxError({
                     message: _response.error.errorMessage,
                     rawResponse: _response.rawResponse,
                 });
@@ -147,20 +145,16 @@ export class AiInfraApiClient {
     /**
      * List available regions for all providers.
      *
-     * @param {AiInfraApiClient.RequestOptions} requestOptions - Request-specific configuration.
+     * @param {SandboxClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
      *     await client.listRegions()
      */
-    public listRegions(
-        requestOptions?: AiInfraApiClient.RequestOptions,
-    ): core.HttpResponsePromise<AiInfraApi.RegionsResponse> {
+    public listRegions(requestOptions?: SandboxClient.RequestOptions): core.HttpResponsePromise<any> {
         return core.HttpResponsePromise.fromPromise(this.__listRegions(requestOptions));
     }
 
-    private async __listRegions(
-        requestOptions?: AiInfraApiClient.RequestOptions,
-    ): Promise<core.WithRawResponse<AiInfraApi.RegionsResponse>> {
+    private async __listRegions(requestOptions?: SandboxClient.RequestOptions): Promise<core.WithRawResponse<any>> {
         let _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             this._options?.headers,
             mergeOnlyDefinedHeaders({ Authorization: await this._getAuthorizationHeader() }),
@@ -170,7 +164,7 @@ export class AiInfraApiClient {
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
                     (await core.Supplier.get(this._options.environment)) ??
-                    environments.AiInfraApiEnvironment.Production,
+                    environments.SandboxEnvironment.Production,
                 "regions",
             ),
             method: "GET",
@@ -181,11 +175,11 @@ export class AiInfraApiClient {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return { data: _response.body as AiInfraApi.RegionsResponse, rawResponse: _response.rawResponse };
+            return { data: _response.body, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
-            throw new errors.AiInfraApiError({
+            throw new errors.SandboxError({
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
                 rawResponse: _response.rawResponse,
@@ -194,15 +188,15 @@ export class AiInfraApiClient {
 
         switch (_response.error.reason) {
             case "non-json":
-                throw new errors.AiInfraApiError({
+                throw new errors.SandboxError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
                     rawResponse: _response.rawResponse,
                 });
             case "timeout":
-                throw new errors.AiInfraApiTimeoutError("Timeout exceeded when calling GET /regions.");
+                throw new errors.SandboxTimeoutError("Timeout exceeded when calling GET /regions.");
             case "unknown":
-                throw new errors.AiInfraApiError({
+                throw new errors.SandboxError({
                     message: _response.error.errorMessage,
                     rawResponse: _response.rawResponse,
                 });
@@ -212,20 +206,18 @@ export class AiInfraApiClient {
     /**
      * Get resource limits and current usage.
      *
-     * @param {AiInfraApiClient.RequestOptions} requestOptions - Request-specific configuration.
+     * @param {SandboxClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @example
      *     await client.getLimits()
      */
-    public getLimits(
-        requestOptions?: AiInfraApiClient.RequestOptions,
-    ): core.HttpResponsePromise<AiInfraApi.LimitsResponse> {
+    public getLimits(requestOptions?: SandboxClient.RequestOptions): core.HttpResponsePromise<Sandbox.LimitsResponse> {
         return core.HttpResponsePromise.fromPromise(this.__getLimits(requestOptions));
     }
 
     private async __getLimits(
-        requestOptions?: AiInfraApiClient.RequestOptions,
-    ): Promise<core.WithRawResponse<AiInfraApi.LimitsResponse>> {
+        requestOptions?: SandboxClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Sandbox.LimitsResponse>> {
         let _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             this._options?.headers,
             mergeOnlyDefinedHeaders({ Authorization: await this._getAuthorizationHeader() }),
@@ -235,7 +227,7 @@ export class AiInfraApiClient {
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
                     (await core.Supplier.get(this._options.environment)) ??
-                    environments.AiInfraApiEnvironment.Production,
+                    environments.SandboxEnvironment.Production,
                 "limits",
             ),
             method: "GET",
@@ -246,11 +238,11 @@ export class AiInfraApiClient {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return { data: _response.body as AiInfraApi.LimitsResponse, rawResponse: _response.rawResponse };
+            return { data: _response.body as Sandbox.LimitsResponse, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
-            throw new errors.AiInfraApiError({
+            throw new errors.SandboxError({
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
                 rawResponse: _response.rawResponse,
@@ -259,15 +251,15 @@ export class AiInfraApiClient {
 
         switch (_response.error.reason) {
             case "non-json":
-                throw new errors.AiInfraApiError({
+                throw new errors.SandboxError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
                     rawResponse: _response.rawResponse,
                 });
             case "timeout":
-                throw new errors.AiInfraApiTimeoutError("Timeout exceeded when calling GET /limits.");
+                throw new errors.SandboxTimeoutError("Timeout exceeded when calling GET /limits.");
             case "unknown":
-                throw new errors.AiInfraApiError({
+                throw new errors.SandboxError({
                     message: _response.error.errorMessage,
                     rawResponse: _response.rawResponse,
                 });

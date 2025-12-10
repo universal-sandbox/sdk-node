@@ -1,8 +1,4 @@
-export { SandboxClient } from './client';
-export {
-  Sandbox,
-  SandboxUrls,
-  ExecutionResult,
-  CreateSandboxOptions,
-  SandboxClientOptions,
-} from './types';
+export * as Sandbox from "./api/index.js";
+export { SandboxError, SandboxTimeoutError } from "./errors/index.js";
+export { SandboxClient } from "./Client.js";
+export { SandboxEnvironment } from "./environments.js";

@@ -3,10 +3,7 @@
  */
 
 /**
- * @example
- *     {
- *         command: "command"
- *     }
+ * Request to execute a command in a sandbox.
  */
 export interface ExecuteRequest {
     /** Command or code to execute */
