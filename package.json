@@ -1,6 +1,6 @@
 {
-  "name": "universal-sandbox",
-  "version": "0.0.1",
+  "name": "@universal-sandbox/sdk",
+  "version": "0.0.6",
   "description": "Node.js SDK for Universal Sandbox API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,7 +11,12 @@
     "build": "tsc",
     "prepublishOnly": "npm run build"
   },
-  "keywords": ["sandbox", "code-interpreter", "browser", "api"],
+  "keywords": [
+    "sandbox",
+    "code-interpreter",
+    "browser",
+    "api"
+  ],
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
