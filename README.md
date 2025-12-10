@@ -7,13 +7,13 @@ Node.js SDK for Universal Sandbox API.
 ## Installation
 
 ```bash
-npm install universal-sandbox
+npm install @universal-sandbox/sdk
 ```
 
 ## Usage
 
 ```typescript
-import { SandboxClient } from 'universal-sandbox';
+import { SandboxClient } from '@universal-sandbox/sdk';
 
 // Initialize client
 const client = new SandboxClient({
