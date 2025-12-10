@@ -1,4 +1,4 @@
-export * as AiInfraApi from "./api/index.js";
-export { AiInfraApiError, AiInfraApiTimeoutError } from "./errors/index.js";
-export { AiInfraApiClient } from "./Client.js";
-export { AiInfraApiEnvironment } from "./environments.js";
+export * as Sandbox from "./api/index.js";
+export { SandboxError, SandboxTimeoutError } from "./errors/index.js";
+export { SandboxClient } from "./Client.js";
+export { SandboxEnvironment } from "./environments.js";
