@@ -5,9 +5,10 @@
 /**
  * Sandbox provider.
  */
-export type SandboxProvider = "e2b" | "volcengine" | "aws";
+export type SandboxProvider = "e2b" | "volcengine" | "aws" | "alibaba";
 export const SandboxProvider = {
     E2B: "e2b",
     Volcengine: "volcengine",
     Aws: "aws",
+    Alibaba: "alibaba",
 } as const;

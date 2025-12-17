@@ -1,4 +1,4 @@
-.PHONY: build publish
+.PHONY: build publish release
 
 # Path to the shared VERSION file
 VERSION_FILE := ../universal-sandbox/VERSION
@@ -20,3 +20,6 @@ build:
 publish: build
 	@echo "Publishing to npm..."
 	@npm publish --access public
+
+# Alias for publish (for consistency across projects)
+release: publish

@@ -42,18 +42,31 @@ export class Sandboxes {
     /**
      * List all sandboxes for the authenticated user.
      *
+     * @param {Sandbox.ListRequest} request
      * @param {Sandboxes.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Sandbox.UnprocessableEntityError}
      *
      * @example
      *     await client.sandboxes.list()
      */
-    public list(requestOptions?: Sandboxes.RequestOptions): core.HttpResponsePromise<Sandbox.SandboxListResponse> {
-        return core.HttpResponsePromise.fromPromise(this.__list(requestOptions));
+    public list(
+        request: Sandbox.ListRequest = {},
+        requestOptions?: Sandboxes.RequestOptions,
+    ): core.HttpResponsePromise<Sandbox.SandboxListResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__list(request, requestOptions));
     }
 
     private async __list(
+        request: Sandbox.ListRequest = {},
         requestOptions?: Sandboxes.RequestOptions,
     ): Promise<core.WithRawResponse<Sandbox.SandboxListResponse>> {
+        const { include_deleted: includeDeleted } = request;
+        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
+        if (includeDeleted != null) {
+            _queryParams["include_deleted"] = includeDeleted.toString();
+        }
+
         let _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             this._options?.headers,
             mergeOnlyDefinedHeaders({ Authorization: await this._getAuthorizationHeader() }),
@@ -68,7 +81,7 @@ export class Sandboxes {
             ),
             method: "GET",
             headers: _headers,
-            queryParameters: requestOptions?.queryParams,
+            queryParameters: { ..._queryParams, ...requestOptions?.queryParams },
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -78,11 +91,19 @@ export class Sandboxes {
         }
 
         if (_response.error.reason === "status-code") {
-            throw new errors.SandboxError({
-                statusCode: _response.error.statusCode,
-                body: _response.error.body,
-                rawResponse: _response.rawResponse,
-            });
+            switch (_response.error.statusCode) {
+                case 422:
+                    throw new Sandbox.UnprocessableEntityError(
+                        _response.error.body as Sandbox.HttpValidationError,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.SandboxError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
         }
 
         switch (_response.error.reason) {

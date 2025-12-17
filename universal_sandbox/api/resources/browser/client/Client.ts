@@ -36,6 +36,7 @@ export class Browser {
     protected readonly _options: Browser.Options;
 
     constructor(_options: Browser.Options = {}) {
+        this._parentClient = parentClient;
         this._options = _options;
     }
 

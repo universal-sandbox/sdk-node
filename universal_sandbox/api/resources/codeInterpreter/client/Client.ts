@@ -36,6 +36,7 @@ export class CodeInterpreter {
     protected readonly _options: CodeInterpreter.Options;
 
     constructor(_options: CodeInterpreter.Options = {}) {
+        this._parentClient = parentClient;
         this._options = _options;
     }
 
