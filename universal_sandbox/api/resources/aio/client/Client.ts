@@ -36,6 +36,7 @@ export class Aio {
     protected readonly _options: Aio.Options;
 
     constructor(_options: Aio.Options = {}) {
+        this._parentClient = parentClient;
         this._options = _options;
     }
 

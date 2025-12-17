@@ -8,6 +8,9 @@ import * as Sandbox from "../index.js";
  * Response containing sandbox details.
  */
 export interface SandboxResponse {
+    /** @internal */
+    private _client?: any;
+
     id: string;
     type: string;
     provider: string;
@@ -17,4 +20,77 @@ export interface SandboxResponse {
     expires_at?: string;
     urls?: Sandbox.SandboxUrls;
     timeout?: number;
+
+    // ========== Custom methods added for convenience ========== //
+
+    /**
+     * @internal
+     * Set the client reference for convenience methods.
+     * This is automatically called when creating sandboxes via the SDK.
+     */
+    public _setClient(client: any): void {
+        this._client = client;
+    }
+
+    /**
+     * Delete this sandbox.
+     *
+     * This is a convenience method that calls sandboxes.delete(sandbox_id).
+     * The client reference is automatically injected when the sandbox is created.
+     *
+     * @param options - Request options
+     * @returns Promise resolving to the delete response
+     *
+     * @example
+     * const sandbox = new Sandbox({ token: "YOUR_TOKEN" });
+     * const sbx = await sandbox.browser.create({ provider: "alibaba" });
+     * // Delete the sandbox (client reference is automatic)
+     * await sbx.delete();
+     */
+    public async delete(options?: any): Promise<any> {
+        if (!this._client) {
+            throw new Error(
+                'No client reference available. Either pass the client explicitly or ' +
+                'ensure the sandbox was created via the SDK methods.'
+            );
+        }
+        return await this._client.sandboxes.delete(this.id, options);
+    }
+
+    /**
+     * Get a Playwright browser instance connected to this browser sandbox.
+     *
+     * This method connects to the browser sandbox via its WebSocket URL and returns
+     * connection information that can be used with Playwright.
+     *
+     * @returns The WebSocket URL for connecting to the browser
+     *
+     * @example
+     * const { chromium } = require('playwright');
+     * const sandbox = new Sandbox({ token: "YOUR_TOKEN" });
+     * const sbx = await sandbox.browser.create({ provider: "alibaba" });
+     *
+     * // Get the WebSocket URL
+     * const wssUrl = sbx.getPlaywrightCDP();
+     *
+     * // Connect with Playwright
+     * const browser = await chromium.connectOverCDP(wssUrl);
+     * const page = await browser.newPage();
+     * await page.goto('https://example.com');
+     * await browser.close();
+     */
+    public getPlaywrightCDP(): string {
+        if (this.type !== 'browser') {
+            throw new Error(
+                `getPlaywrightCDP() is only available for browser sandboxes, got type: ${this.type}`
+            );
+        }
+
+        if (!this.urls?.wssUrl) {
+            throw new Error('WebSocket URL (wssUrl) is not available for this sandbox');
+        }
+
+        return this.urls.wssUrl;
+    }
+
 }

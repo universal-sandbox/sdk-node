@@ -12,8 +12,8 @@ export interface CreateSandboxRequest {
     provider?: Sandbox.SandboxProvider;
     /** Preferred region for the sandbox */
     region?: string;
-    /** Custom timeout in minutes */
-    timeout_minutes?: number;
+    /** Timeout in minutes */
+    timeout?: number;
     /** Additional metadata */
     metadata?: Record<string, any>;
 }
